@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676302176564",
+    "project_id": "kobox-636bb",
+    "storage_bucket": "kobox-636bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676302176564:android:7e8b81ad9fcc04fca32561",
+        "android_client_info": {
+          "package_name": "com.fmtss.kobox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBg_vneYOnLKpR4ql0TFrl0a3h2Gcjx0U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

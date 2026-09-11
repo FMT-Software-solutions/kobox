@@ -1,0 +1,31 @@
+# kobox.fmtsoftware.com — the same app, built for the browser.
+#
+# EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_KEY must be set in the
+# Netlify site's environment variables. They are inlined at BUILD time, and
+# src/lib/env.ts refuses to start without them, so a missing value shows up as
+# a blank page rather than a quietly broken one. (EXPO_PUBLIC_BACKEND_URL is
+# optional; it falls back to production.)
+
+[build]
+  command = "npx expo export --platform web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Single-page app: every path is served by index.html and routed client-side,
+# which is what makes /privacy and /delete-account real URLs.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
+    # Money records and sign-in happen here, so never allow a downgrade to HTTP.
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"

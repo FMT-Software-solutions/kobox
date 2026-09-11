@@ -3307,3 +3307,62 @@ describe('sms cost estimate', () => {
     }
   });
 });
+
+/**
+ * Account deletion.
+ *
+ * Only the PREVIEW is exercised here. `prepare_account_deletion` would delete
+ * every group this test account alone owns — which is every scratch group the
+ * other suites are still using — and the auth user can only be removed with the
+ * service role, which these checks deliberately never hold.
+ */
+describe('account deletion', () => {
+  it('lists a group nobody else can open as deleted with the account', async () => {
+    const { groupId } = await createScratchGroup('Ledger — deletion solo');
+
+    const preview = (await rpc('account_deletion_preview', {} as never)) as {
+      blocking: { id: string }[];
+      deleting: { id: string }[];
+    };
+
+    assert.ok(
+      preview.deleting.some((group) => group.id === groupId),
+      'a group with no other account goes with its owner'
+    );
+    assert.ok(
+      !preview.blocking.some((group) => group.id === groupId),
+      'and does not block the deletion'
+    );
+  });
+
+  it('keeps members who never installed the app from blocking it', async () => {
+    // A treasurer-typed member has no account and cannot administer anything,
+    // so a group full of them is still the owner's alone.
+    const { groupId } = await createScratchGroup('Ledger — deletion typed members');
+    await rpc('add_member', {
+      p_group_id: groupId,
+      p_full_name: 'Kwame Asante',
+      p_phone: nextPhone(),
+    });
+
+    const preview = (await rpc('account_deletion_preview', {} as never)) as {
+      blocking: { id: string }[];
+      deleting: { id: string }[];
+    };
+
+    assert.ok(preview.deleting.some((group) => group.id === groupId));
+    assert.ok(!preview.blocking.some((group) => group.id === groupId));
+  });
+
+  it('refuses somebody who is not signed in', async () => {
+    const anonymous = createClient<Database>(url!, key!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const preview = await anonymous.rpc('account_deletion_preview');
+    assert.ok(preview.error, 'no preview without an account');
+
+    const prepared = await anonymous.rpc('prepare_account_deletion');
+    assert.ok(prepared.error, 'and nothing prepared either');
+  });
+});

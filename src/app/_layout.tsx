@@ -53,6 +53,7 @@ export default function RootLayout() {
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="(app)" />
                   <Stack.Screen name="(auth)" />
+                  <Stack.Screen name="(public)" />
                 </Stack>
               </SplashGate>
               <StatusBar style={isDark ? 'light' : 'dark'} />

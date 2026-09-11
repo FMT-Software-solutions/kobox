@@ -510,7 +510,7 @@ export type Database = {
         Row: {
           brand_colour: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           currency: string
           description: string | null
           id: string
@@ -528,7 +528,7 @@ export type Database = {
         Insert: {
           brand_colour?: string | null
           created_at?: string
-          created_by: string
+          created_by?: string | null
           currency?: string
           description?: string | null
           id?: string
@@ -546,7 +546,7 @@ export type Database = {
         Update: {
           brand_colour?: string | null
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           currency?: string
           description?: string | null
           id?: string
@@ -2370,6 +2370,7 @@ export type Database = {
       }
     }
     Functions: {
+      account_deletion_preview: { Args: never; Returns: Json }
       acknowledge_member_link: {
         Args: { p_event_id: string }
         Returns: undefined
@@ -2530,7 +2531,7 @@ export type Database = {
         Returns: {
           brand_colour: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           currency: string
           description: string | null
           id: string
@@ -2766,7 +2767,7 @@ export type Database = {
         Returns: {
           brand_colour: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           currency: string
           description: string | null
           id: string
@@ -2875,6 +2876,7 @@ export type Database = {
         Args: { p_member_id: string; p_plan_id: string }
         Returns: number
       }
+      prepare_account_deletion: { Args: never; Returns: Json }
       preview_group_message: {
         Args: {
           p_audience: string
@@ -2997,7 +2999,7 @@ export type Database = {
         Returns: {
           brand_colour: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           currency: string
           description: string | null
           id: string
@@ -3162,7 +3164,7 @@ export type Database = {
         Returns: {
           brand_colour: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           currency: string
           description: string | null
           id: string

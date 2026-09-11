@@ -6,11 +6,13 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  FileText,
   MessageSquare,
   Moon,
   PenLine,
   Smartphone,
   Sun,
+  Trash2,
   UserRound,
 } from 'lucide-react-native';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -150,6 +152,12 @@ export default function SettingsScreen() {
           <Card className="gap-0 p-0">
             <Row first icon={UserRound} label="Profile" onPress={() => router.push('/profile')} />
             <Row icon={Bell} label="Reminders" onPress={() => router.push('/reminders')} />
+            <Row icon={FileText} label="Privacy policy" onPress={() => router.push('/privacy')} />
+            <Row
+              icon={Trash2}
+              label="Delete account"
+              onPress={() => router.push('/delete-account')}
+            />
           </Card>
         </View>
 

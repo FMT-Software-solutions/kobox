@@ -221,7 +221,7 @@ expenses, susu.
 | Expenses      | `expenses.tsx`, `expenses/new.tsx`                                                   |
 | Tags          | `tags.tsx`, `tags/new.tsx`, `tags/[id].tsx`, `plans/[id]/amounts.tsx`                |
 
-49 migrations, all applied and tracked. Feature code in `src/features/*` as
+51 migrations, all applied and tracked. Feature code in `src/features/*` as
 `api.ts` + `use-*.ts` pairs.
 
 ### Auth — in progress (4 August 2026)
@@ -369,7 +369,7 @@ Still to do: the PIN with device trust, and the group switcher.
 ## Testing
 
 - **60 unit tests** — `money`, `cycles`, `phone`, `identity`, `sms`
-- **109 ledger checks** — `scripts/ledger-check.ts`, run against the real
+- **112 ledger checks** — `scripts/ledger-check.ts`, run against the real
   project, signed in as an ordinary user so **RLS is exercised too**. Each test
   builds a throwaway group and deletes it afterwards.
 
@@ -597,10 +597,18 @@ In rough order of how much they block real use:
 8. **iOS is untested**, and push there needs APNs certificates, which needs the
    Apple Developer account.
 9. **No audit log.** Every money RPC records who acted, but nothing surfaces it.
-10. **Message history has no per-recipient view.** It shows counts (texted,
+10. **Web phase 2 — the full app in a browser, for iPhone users.** Phase 1
+    (section 14) shipped only the public pages. Known gaps before the signed-in
+    app is web-ready: 7 `Alert.alert` calls in 5 files are no-ops on the web
+    (the message composer's "Send this message?" among them); report export
+    uses `expo-print` / `expo-sharing` / `expo-file-system` (phone-only);
+    push is phone-only; phone-width screens need a centred column on desktop.
+    Prefer `Platform.OS` branches or `.web.tsx` files where one implementation
+    cannot serve both well.
+11. **Message history has no per-recipient view.** It shows counts (texted,
     delivered, pushed, not texted); "which three were not texted?" needs a
     detail screen over the outbox rows.
-11. **PDF reports do not carry the group logo.** `expo-print` renders
+12. **PDF reports do not carry the group logo.** `expo-print` renders
     remote images unreliably; embedding would mean fetching the logo as
     base64 first.
 
@@ -682,6 +690,56 @@ section 12.
 Cron jobs: `kobox-dispatch-notifications` (every minute), `kobox-period-reminders`
 (08:00 daily), `kobox-overdue-reminders` (Mondays 09:00),
 `kobox-invite-expiry` (10:00 daily).
+
+### 14. Web target, public pages and account deletion — DONE (11 September 2026)
+
+Migration `20260911050000_account_deletion.sql`, the `delete-account` Edge
+Function, `src/features/account/*`, `src/app/(public)/*`,
+`src/components/shared/public-page.tsx` and `netlify.toml`.
+
+**One codebase, two targets.** The web app is this app built with
+`npx expo export --platform web` and hosted on Netlify at
+`kobox.fmtsoftware.com`, as FMT's other subdomains are. Phase 1 carries only
+the pages Google Play needs to reach from a browser; phase 2 (what is left,
+item 10) opens the signed-in app for iPhone users.
+
+**Web output is `single`, not `static`.** Static rendering runs the app in Node
+at build time, where the Supabase client reads AsyncStorage and there is no
+`window` — it crashed the dev server twice. A single-page app renders only in
+the browser; Netlify's `/* → /index.html` rule makes every route a real URL.
+
+**Test both targets after any change**, because one codebase means a web fix
+can break the phone: `npm run check`, `npx expo export --platform web` (proves
+the web build compiles), and the Android bundle through Metro
+(`/node_modules/expo-router/entry.bundle?platform=android&dev=true`). The
+in-app browser pane in Claude Code refuses `localhost`, so web pages have to be
+looked at in a real browser.
+
+**`(public)` routes sit outside both guards**: `/privacy` and
+`/delete-account`. A signed-in member reaches the same screens from Settings.
+
+**Account deletion.** Until this migration it was impossible:
+`groups.created_by` was NOT NULL with no ON DELETE rule. Now it is SET NULL,
+and the rule is:
+
+- the account, profile, photo, devices and notifications go (cascades);
+- groups where the leaver is the only ACCOUNT are deleted with them — nobody
+  else can open them;
+- groups they alone own that other people use BLOCK the deletion, by name,
+  until they hand over ownership or delete the group;
+- in shared groups the member row is unlinked, not deleted: it is the group's
+  financial record, and other balances are computed from it.
+
+`prepare_account_deletion()` runs AS the user (the owner checks read
+`auth.uid()`); the Edge Function then removes avatars and the auth user with
+the service role. If that second step fails the first is safe to repeat. The
+web page signs people in inline, with `shouldCreateUser: false` so it can
+never create an account, and confirms with a second tap because `Alert` does
+nothing on the web.
+
+**The privacy policy is written against the code** — every processor it names
+is one Kobox calls, and its deletion section matches the rule above. Change
+one, change the other. It is a draft for the owner's review, not legal advice.
 
 ### 13. Messages, settings and brand — DONE (11 September 2026)
 

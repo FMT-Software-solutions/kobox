@@ -2,19 +2,19 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    // Node's built-in test runner strips types but still resolves ESM, so test
+    // files must import with an explicit .ts extension. Safe here because Expo
+    // compiles via Babel and tsc only ever type-checks (--noEmit).
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/assets/*": [
-        "./assets/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/assets/*": ["./assets/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],
+  // Edge Functions run on Deno, not React Native: they import from URLs and use
+  // the Deno global, neither of which this project's TypeScript knows about.
+  // The Supabase CLI type-checks them on deploy.
+  "exclude": ["supabase/functions"]
 }

@@ -1,3 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Kobox design tokens.
+ *
+ * Everything visual in the app resolves back to these variables — never hardcode
+ * a colour in a component. Primary is a deep jade (trust, growth, money kept safe);
+ * accent is a warm gold (the "kobo" coin). Semantic success/warning/destructive are
+ * defined separately from accent so financial state is never ambiguous.
+ */
+
+@layer base {
+  :root {
+    --background: 150 30% 99%;
+    --foreground: 165 25% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 165 25% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 165 25% 11%;
+
+    --primary: 162 84% 27%;
+    --primary-foreground: 150 40% 98%;
+
+    --secondary: 158 24% 95%;
+    --secondary-foreground: 165 28% 18%;
+
+    --muted: 158 20% 95%;
+    --muted-foreground: 165 10% 42%;
+
+    --accent: 38 92% 50%;
+    --accent-foreground: 30 90% 14%;
+
+    --destructive: 0 72% 47%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 68% 34%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 32 94% 46%;
+    --warning-foreground: 30 90% 12%;
+
+    --border: 158 18% 90%;
+    --input: 158 18% 90%;
+    --ring: 162 84% 27%;
+
+    --radius: 1rem;
+  }
+
+  .dark:root {
+    --background: 168 30% 7%;
+    --foreground: 150 12% 96%;
+
+    --card: 168 26% 10%;
+    --card-foreground: 150 12% 96%;
+
+    --popover: 168 26% 10%;
+    --popover-foreground: 150 12% 96%;
+
+    --primary: 158 72% 45%;
+    --primary-foreground: 168 40% 8%;
+
+    --secondary: 168 18% 16%;
+    --secondary-foreground: 150 12% 96%;
+
+    --muted: 168 18% 16%;
+    --muted-foreground: 155 10% 65%;
+
+    --accent: 38 92% 55%;
+    --accent-foreground: 30 90% 10%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 46%;
+    --success-foreground: 168 40% 8%;
+
+    --warning: 38 90% 55%;
+    --warning-foreground: 30 90% 10%;
+
+    --border: 168 16% 20%;
+    --input: 168 16% 20%;
+    --ring: 158 72% 45%;
+  }
+}
+
 :root {
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,

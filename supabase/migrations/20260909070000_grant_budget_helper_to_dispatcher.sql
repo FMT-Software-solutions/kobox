@@ -1,0 +1,21 @@
+-- Give the dispatcher back the one budget helper it actually calls.
+--
+-- `20260909060000` closed `group_sms_used_this_month` to every role. That was
+-- right for the app and wrong for the dispatcher, which asks the same question
+-- one more time before spending: a month's cap can be reached between the row
+-- being queued and the message going out.
+--
+-- The dispatcher reaches Postgres through PostgREST as `service_role`, so it
+-- needs an explicit grant — revoking from `public` took the inherited one away
+-- from every role at once, service_role included.
+--
+-- `group_can_send_sms` deliberately gets NO grant. It is only ever called from
+-- inside `enqueue_notification`, which is SECURITY DEFINER and therefore runs
+-- as its owner; a caller's own privileges never come into it.
+--
+-- The alternative was to compute the month's spend in TypeScript instead. That
+-- is the mistake this file keeps recording: the window would then be defined in
+-- two places, and the SQL one and the Deno one would disagree the first time
+-- either changed.
+
+grant execute on function group_sms_used_this_month(uuid) to service_role;

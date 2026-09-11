@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "kobox",
+    "name": "Kobox",
     "slug": "kobox",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,11 +8,17 @@
     "scheme": "kobox",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.fmtss.kobox",
+      "supportsTablet": true,
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.fmtss.kobox",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0B3D2E",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -26,17 +32,41 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Kobox uses your photos so you can set a profile picture your group will recognise."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#0B3D2E",
+          "dark": {
+            "backgroundColor": "#07231A"
+          },
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-sharing",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8d5867f0-c5cc-4645-a232-3c015c36ee34"
+      }
+    },
+    "owner": "ankomahenes-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8d5867f0-c5cc-4645-a232-3c015c36ee34"
     }
   }
 }

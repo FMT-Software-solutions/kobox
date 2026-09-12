@@ -73,9 +73,14 @@ export default function PrivacyScreen() {
           Members of your group, according to their role. Admins and treasurers see the
           group&rsquo;s records; members see their own.
         </Item>
+        {/* Categories, not vendor names. Naming each one ties the policy to
+            suppliers we may change, and says nothing a reader needs. Paystack
+            is the exception: people hand it their card details, so they should
+            know whose form they are filling in. */}
         <Item>
-          Service providers that run Kobox for us: Supabase (hosting and sign-in), Arkesel (text
-          messages), Paystack (payments) and Expo (push notifications).
+          Service providers that help us run Kobox: cloud hosting and database, text message
+          delivery, and push notification delivery. Payments are processed by Paystack. We can name
+          our current providers on request.
         </Item>
       </Section>
 

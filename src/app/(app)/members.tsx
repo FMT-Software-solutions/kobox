@@ -25,6 +25,7 @@ import { useTagsByMember } from '@/features/tags/use-tags';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import type { CurrencyCode } from '@/lib/money';
 import { formatGhanaPhone } from '@/lib/phone';
+import { goBack } from '@/lib/navigation';
 
 export default function MembersScreen() {
   const brand = useBrand();
@@ -103,7 +104,7 @@ export default function MembersScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             className="-ml-2 rounded-full p-2 active:bg-secondary">
             <ChevronLeft size={22} color="#66756F" />
           </Pressable>

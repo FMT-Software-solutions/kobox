@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { ArrowDown, ArrowUp, ChevronLeft, Tags as TagsIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import {
@@ -27,6 +27,7 @@ import {
 } from '@/features/tags/use-tags';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import type { CurrencyCode, Minor } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 /**
  * What each tag pays on one contribution — "Executives ₵100, everyone else ₵50"
@@ -38,7 +39,6 @@ import type { CurrencyCode, Minor } from '@/lib/money';
  */
 export default function PlanAmountsScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { membership } = useCurrentGroup();
 
@@ -70,7 +70,7 @@ export default function PlanAmountsScreen() {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-background px-6">
         <Text variant="heading">Contribution not found</Text>
-        <Button label="Go back" variant="outline" onPress={() => router.back()} />
+        <Button label="Go back" variant="outline" onPress={() => goBack()} />
       </View>
     );
   }
@@ -130,7 +130,7 @@ export default function PlanAmountsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

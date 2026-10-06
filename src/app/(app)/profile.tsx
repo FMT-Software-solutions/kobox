@@ -1,5 +1,4 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
 import { Camera, ChevronLeft, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import {
@@ -26,6 +25,7 @@ import {
   useUploadMyAvatar,
 } from '@/features/profile/use-profile';
 import { formatGhanaPhone } from '@/lib/phone';
+import { goBack } from '@/lib/navigation';
 
 /**
  * Your own name and picture.
@@ -37,7 +37,6 @@ import { formatGhanaPhone } from '@/lib/phone';
 export default function ProfileScreen() {
   const brand = useBrand();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { session } = useSession();
 
   const profile = useMyProfile();
@@ -126,7 +125,7 @@ export default function ProfileScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

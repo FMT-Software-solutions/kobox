@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { BadgeCheck, ChevronLeft, Clock, Trash2, TriangleAlert } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
@@ -19,6 +18,7 @@ import {
   useWithdrawSenderIdRequest,
 } from '@/features/sms/use-sms';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 /** Arkesel's hard limit, and the reason the field stops at eleven characters. */
 const MAX_LENGTH = 11;
@@ -42,7 +42,6 @@ function statusBadge(status: SenderIdRequest['status']) {
 export default function SenderIdScreen() {
   const brand = useBrand();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
 
   const isAdmin =
@@ -118,7 +117,7 @@ export default function SenderIdScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

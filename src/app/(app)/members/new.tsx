@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -12,6 +11,7 @@ import { useCurrentGroup } from '@/features/groups/current-group';
 import { useAddMember } from '@/features/members/use-members';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import { ghanaNetwork, parseGhanaPhone } from '@/lib/phone';
+import { goBack } from '@/lib/navigation';
 
 const ROLE_OPTIONS: readonly Option<MemberRole>[] = [
   { value: 'member', label: 'Member', hint: 'Pays and views' },
@@ -29,7 +29,6 @@ const ARREARS_OPTIONS: readonly Option<ArrearsChoice>[] = [
 
 export default function NewMemberScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const addMember = useAddMember();
 
@@ -80,7 +79,7 @@ export default function NewMemberScreen() {
         role,
         includePastPeriods: arrears === 'from-start',
       });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not add the member. Try again.');
     }
@@ -97,7 +96,7 @@ export default function NewMemberScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

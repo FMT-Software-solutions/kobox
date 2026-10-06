@@ -25,6 +25,7 @@ import { useBrand } from '@/features/groups/brand';
 import { useCurrentGroup } from '@/features/groups/current-group';
 import { loadAppearance, saveAppearance, type AppearanceMode } from '@/lib/appearance';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 const APPEARANCE: { mode: AppearanceMode; label: string; icon: typeof Sun }[] = [
   { mode: 'system', label: 'Phone', icon: Smartphone },
@@ -100,7 +101,7 @@ export default function SettingsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

@@ -1,5 +1,4 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
 import { Camera, Check, ChevronLeft, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
@@ -21,6 +20,7 @@ import {
 } from '@/features/groups/use-settings';
 import { BRAND_PRESETS, DEFAULT_BRAND, type BrandKey } from '@/lib/brand';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 /**
  * Who the group is, and what it looks like.
@@ -36,7 +36,6 @@ import { ROLE_RANK, type MemberRole } from '@/lib/domain';
  */
 export default function GroupSettingsScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const brand = useBrand();
   const { membership } = useCurrentGroup();
 
@@ -156,7 +155,7 @@ export default function GroupSettingsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

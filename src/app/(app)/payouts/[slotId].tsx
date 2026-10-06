@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
@@ -23,6 +23,7 @@ import { useCurrentGroup } from '@/features/groups/current-group';
 import type { RotationSlotRow } from '@/features/rotation/api';
 import { useRecordPayout, useRotation, useSlotArrears } from '@/features/rotation/use-rotation';
 import type { CurrencyCode, Minor } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 export default function PayoutScreen() {
   // planId travels with the link so this screen needs no lookup of its own —
@@ -53,7 +54,6 @@ export default function PayoutScreen() {
 
 function PayoutForm({ slot, planId }: { slot: RotationSlotRow; planId: string }) {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const recordPayout = useRecordPayout();
 
@@ -83,7 +83,7 @@ function PayoutForm({ slot, planId }: { slot: RotationSlotRow; planId: string })
         settleArrears: owed > 0 ? settleArrears : false,
         note: note.trim() === '' ? null : note.trim(),
       });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not record the payout. Try again.');
     }
@@ -100,7 +100,7 @@ function PayoutForm({ slot, planId }: { slot: RotationSlotRow; planId: string })
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

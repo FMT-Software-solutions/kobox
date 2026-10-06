@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
@@ -16,6 +15,7 @@ import { useMemberPayments, useOutstanding } from '@/features/payments/use-payme
 import { ExportActions } from '@/features/reports/export-actions';
 import { reportHtml, toCsv } from '@/features/reports/export';
 import { formatMoney, type CurrencyCode } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 /**
  * One member's whole position: what they have paid, what they still owe broken
@@ -28,7 +28,6 @@ import { formatMoney, type CurrencyCode } from '@/lib/money';
  */
 export default function MemberReportScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
 
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -146,7 +145,7 @@ export default function MemberReportScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

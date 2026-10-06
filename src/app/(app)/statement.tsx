@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { CheckCircle2, ChevronLeft, Inbox } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,11 +13,11 @@ import { useCurrentGroup } from '@/features/groups/current-group';
 import { useMemberPayments, useOutstanding } from '@/features/payments/use-payments';
 import { formatFullDate } from '@/features/plans/labels';
 import type { CurrencyCode } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 export default function StatementScreen() {
   const brand = useBrand();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
 
   const currency = (membership?.currency ?? 'GHS') as CurrencyCode;
@@ -46,7 +45,7 @@ export default function StatementScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

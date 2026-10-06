@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -11,6 +10,7 @@ import { Text } from '@/components/ui/text';
 import { rememberSignIn } from '@/features/auth/last-login';
 import { describeAuthError } from '@/lib/auth-errors';
 import { supabase } from '@/lib/supabase';
+import { goBack } from '@/lib/navigation';
 
 const credentialsSchema = z.object({
   email: z.string().trim().min(1, 'Enter your email').email('That does not look like an email'),
@@ -21,7 +21,6 @@ type Mode = 'sign-in' | 'sign-up';
 
 export default function EmailSignInScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
 
   const [mode, setMode] = useState<Mode>('sign-in');
   const [fullName, setFullName] = useState('');
@@ -85,7 +84,7 @@ export default function EmailSignInScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

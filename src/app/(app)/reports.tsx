@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { useBrand } from '@/features/groups/brand';
+import { goBack } from '@/lib/navigation';
 
 /**
  * Five reports, not a report builder.
@@ -73,7 +74,7 @@ export default function ReportsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -19,6 +18,7 @@ import { useOutstanding, useRecordPayment } from '@/features/payments/use-paymen
 import { usePlans } from '@/features/plans/use-plans';
 import { ROLE_RANK, type MemberRole, type PaymentMethod } from '@/lib/domain';
 import { formatMoney, type CurrencyCode, type Minor } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 /** Sentinel for "not earmarked" — OptionGroup values must be strings. */
 const GENERAL = '__general__';
@@ -33,7 +33,6 @@ const METHOD_OPTIONS: readonly Option<PaymentMethod>[] = [
 
 export default function NewPaymentScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const recordPayment = useRecordPayment();
 
@@ -166,7 +165,7 @@ export default function NewPaymentScreen() {
         note: note.trim() === '' ? null : note.trim(),
         designatedPlanId,
       });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not record the payment. Try again.');
     }
@@ -183,7 +182,7 @@ export default function NewPaymentScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

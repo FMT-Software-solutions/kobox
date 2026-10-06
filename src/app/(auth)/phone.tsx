@@ -10,6 +10,7 @@ import { Text } from '@/components/ui/text';
 import { ghanaNetwork, parseGhanaPhone } from '@/lib/phone';
 import { describeAuthError } from '@/lib/auth-errors';
 import { supabase } from '@/lib/supabase';
+import { goBack } from '@/lib/navigation';
 
 /**
  * Step one of phone sign-in: prove which number you are claiming.
@@ -61,7 +62,7 @@ export default function PhoneSignInScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

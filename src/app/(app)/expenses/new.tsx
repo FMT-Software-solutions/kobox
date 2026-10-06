@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -15,6 +14,7 @@ import { useCurrentGroup } from '@/features/groups/current-group';
 import { toIsoDate, utcDate } from '@/lib/cycles';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import type { CurrencyCode, Minor } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 const CATEGORY_OPTIONS: readonly Option<string>[] = [
   { value: 'welfare', label: 'Welfare' },
@@ -27,7 +27,6 @@ const CATEGORY_OPTIONS: readonly Option<string>[] = [
 
 export default function NewExpenseScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const recordExpense = useRecordExpense();
 
@@ -76,7 +75,7 @@ export default function NewExpenseScreen() {
         note: note.trim() === '' ? null : note.trim(),
         spentAt: `${toIsoDate(spentDate)}T12:00:00.000Z`,
       });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not record the expense. Try again.');
     }
@@ -93,7 +92,7 @@ export default function NewExpenseScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

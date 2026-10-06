@@ -32,6 +32,7 @@ import {
   useSmsTransactions,
 } from '@/features/sms/use-sms';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 function LedgerRow({ entry, first }: { entry: SmsTransaction; first: boolean }) {
   const brand = useBrand();
@@ -143,7 +144,7 @@ export default function SmsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

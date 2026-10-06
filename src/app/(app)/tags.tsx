@@ -11,6 +11,7 @@ import { useBrand } from '@/features/groups/brand';
 import { useCurrentGroup } from '@/features/groups/current-group';
 import { useTags } from '@/features/tags/use-tags';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 /**
  * Tags are sub-groups: Executives, Committee, Youth. A contribution can be
@@ -38,7 +39,7 @@ export default function TagsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

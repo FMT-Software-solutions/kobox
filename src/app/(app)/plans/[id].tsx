@@ -25,6 +25,7 @@ import { useRotation } from '@/features/rotation/use-rotation';
 import { usePlanTagAmounts, useTags } from '@/features/tags/use-tags';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import { formatMoney, type CurrencyCode } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 export default function PlanDetailScreen() {
   const brand = useBrand();
@@ -58,7 +59,7 @@ export default function PlanDetailScreen() {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-background px-6">
         <Text variant="heading">Contribution not found</Text>
-        <Button label="Go back" variant="outline" onPress={() => router.back()} />
+        <Button label="Go back" variant="outline" onPress={() => goBack()} />
       </View>
     );
   }
@@ -102,7 +103,7 @@ export default function PlanDetailScreen() {
             variant="ghost"
             size="sm"
             icon={<ChevronLeft size={22} color="#66756F" />}
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             className="-ml-2"
           />
           <Text variant="title" numberOfLines={1} className="flex-1">

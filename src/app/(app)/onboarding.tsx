@@ -11,6 +11,7 @@ import { Text } from '@/components/ui/text';
 import { useCurrentGroup } from '@/features/groups/current-group';
 import { useCreateGroup, useJoinGroup } from '@/features/groups/use-groups';
 import { useMyJoinRequests } from '@/features/groups/use-membership';
+import { goBack } from '@/lib/navigation';
 
 type Mode = 'choose' | 'create' | 'join';
 
@@ -153,7 +154,7 @@ export default function OnboardingScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             className="-ml-2 rounded-full p-2 active:bg-secondary">
             <ChevronLeft size={22} color="#66756F" />
           </Pressable>

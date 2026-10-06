@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -19,6 +18,7 @@ import { useTags } from '@/features/tags/use-tags';
 import { describeBackfill, toIsoDate, utcDate } from '@/lib/cycles';
 import type { PlanFrequency, PlanKind } from '@/lib/domain';
 import type { CurrencyCode, Minor } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 const KIND_OPTIONS: readonly Option<PlanKind>[] = [
   { value: 'dues', label: 'Dues', hint: 'Regular membership fee' },
@@ -51,7 +51,6 @@ const FREQUENCY_OPTIONS: readonly Option<PlanFrequency>[] = [
 
 export default function NewPlanScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const createPlan = useCreatePlan();
 
@@ -138,7 +137,7 @@ export default function NewPlanScreen() {
         endDate: isOneOff ? toIsoDate(closeDate) : null,
         audienceTagId: canScopeToTag ? audienceTagId : null,
       });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create the plan. Try again.');
     }
@@ -155,7 +154,7 @@ export default function NewPlanScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

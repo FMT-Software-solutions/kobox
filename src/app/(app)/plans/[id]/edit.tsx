@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
@@ -24,6 +24,7 @@ import type { PlanRow } from '@/features/plans/api';
 import { usePlan, useUpdatePlan } from '@/features/plans/use-plans';
 import { describeBackfill, nextPeriodStart, toIsoDate, utcDate } from '@/lib/cycles';
 import type { CurrencyCode, Minor } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 export default function EditPlanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -58,7 +59,6 @@ export default function EditPlanScreen() {
  */
 function EditPlanForm({ plan }: { plan: PlanRow }) {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const updatePlan = useUpdatePlan();
 
@@ -102,7 +102,7 @@ function EditPlanForm({ plan }: { plan: PlanRow }) {
         // period blocks it, so send the change either way.
         startDate: startMovedEarlier || startMovedLater ? nextStartIso : undefined,
       });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save the changes. Try again.');
     }
@@ -119,7 +119,7 @@ function EditPlanForm({ plan }: { plan: PlanRow }) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

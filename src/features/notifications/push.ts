@@ -24,6 +24,10 @@ Notifications.setNotificationHandler({
 });
 
 export async function registerPushToken(): Promise<string | null> {
+  // Push is the phone app's. In a browser this would only raise a permission
+  // prompt on first load, for a token Expo cannot issue there anyway.
+  if (Platform.OS === 'web') return null;
+
   // A simulator has no push service, and asking produces a confusing failure
   // rather than a token.
   if (!Device.isDevice) return null;
@@ -85,7 +89,7 @@ export async function registerPushToken(): Promise<string | null> {
 /** Drops this device's token, so a signed-out phone stops buzzing. */
 export async function unregisterPushToken(): Promise<void> {
   try {
-    if (!Device.isDevice) return;
+    if (Platform.OS === 'web' || !Device.isDevice) return;
 
     const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
     if (!projectId) return;

@@ -1,13 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Check, ChevronLeft, Plus, Receipt, X } from 'lucide-react-native';
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/shared/empty-state';
@@ -16,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { confirm } from '@/lib/confirm';
 import {
   useApproveExpense,
   useExpenses,
@@ -26,6 +20,7 @@ import { useCurrentGroup } from '@/features/groups/current-group';
 import { formatFullDate } from '@/features/plans/labels';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import type { CurrencyCode } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 export default function ExpensesScreen() {
   const insets = useSafeAreaInsets();
@@ -44,29 +39,25 @@ export default function ExpensesScreen() {
   const voidExpense = useVoidExpense();
 
   function confirmReject(expenseId: string) {
-    Alert.alert('Reject this expense?', 'It will not count against the group balance.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Reject',
-        style: 'destructive',
-        onPress: () => reject.mutate({ expenseId, reason: 'Rejected by an admin' }),
-      },
-    ]);
+    confirm({
+      title: 'Reject this expense?',
+      message: 'It will not count against the group balance.',
+      confirmLabel: 'Reject',
+      destructive: true,
+    }).then((yes) => {
+      if (yes) reject.mutate({ expenseId, reason: 'Rejected by an admin' });
+    });
   }
 
   function confirmVoid(expenseId: string) {
-    Alert.alert(
-      'Void this expense?',
-      'The record stays and is marked voided, and the group balance corrects itself.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Void it',
-          style: 'destructive',
-          onPress: () => voidExpense.mutate({ expenseId, reason: 'Voided by an admin' }),
-        },
-      ]
-    );
+    confirm({
+      title: 'Void this expense?',
+      message: 'The record stays and is marked voided, and the group balance corrects itself.',
+      confirmLabel: 'Void it',
+      destructive: true,
+    }).then((yes) => {
+      if (yes) voidExpense.mutate({ expenseId, reason: 'Voided by an admin' });
+    });
   }
 
   return (
@@ -78,7 +69,7 @@ export default function ExpensesScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             className="-ml-2 rounded-full p-2 active:bg-secondary">
             <ChevronLeft size={22} color="#66756F" />
           </Pressable>

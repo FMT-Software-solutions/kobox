@@ -11,6 +11,7 @@ import type { NotificationPreferences } from '@/features/notifications/api';
 import { usePreferences, useSavePreferences } from '@/features/notifications/use-notifications';
 import { useSmsBalance } from '@/features/sms/use-sms';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 interface ToggleProps {
   label: string;
@@ -78,7 +79,7 @@ export default function RemindersScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

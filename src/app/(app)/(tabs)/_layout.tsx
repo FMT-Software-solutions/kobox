@@ -1,15 +1,17 @@
 import { Tabs } from 'expo-router';
 import { Home, ReceiptText, Menu } from 'lucide-react-native';
-import { useColorScheme } from 'react-native';
 
 import { useBrand } from '@/features/groups/brand';
+import { useIsDark } from '@/lib/use-is-dark';
 
 /**
  * Three tabs, deliberately. Every extra tab is a decision the user has to make
  * before they can do anything; Kobox should be usable without reading a manual.
  */
 export default function TabsLayout() {
-  const isDark = useColorScheme() === 'dark';
+  // The app's own answer, not the device's: in a browser the two can differ,
+  // and the tab bar would then be the one light strip on a dark page.
+  const isDark = useIsDark();
   const brand = useBrand();
 
   // The tab bar sits outside the NativeWind tree, so it reads the same token

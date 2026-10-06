@@ -1,7 +1,7 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { OptionGroup, type Option } from '@/components/ui/option-group';
 import { Text } from '@/components/ui/text';
+import { confirm } from '@/lib/confirm';
 import { useCurrentGroup } from '@/features/groups/current-group';
 import { useMembers } from '@/features/members/use-members';
 import { ColourPicker } from '@/features/tags/colour-picker';
@@ -20,6 +21,7 @@ import {
   useTags,
 } from '@/features/tags/use-tags';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 type ArrearsChoice = 'from-now' | 'from-start';
 
@@ -30,7 +32,6 @@ const ARREARS_OPTIONS: readonly Option<ArrearsChoice>[] = [
 
 export default function TagScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { membership } = useCurrentGroup();
 
@@ -67,7 +68,7 @@ export default function TagScreen() {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-background px-6">
         <Text variant="heading">Tag not found</Text>
-        <Button label="Go back" variant="outline" onPress={() => router.back()} />
+        <Button label="Go back" variant="outline" onPress={() => goBack()} />
       </View>
     );
   }
@@ -109,33 +110,28 @@ export default function TagScreen() {
           includePastPeriods: arrears === 'from-start',
         });
       }
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save the tag. Try again.');
     }
   }
 
-  function confirmDelete() {
-    Alert.alert(
-      `Delete ${tag!.name}?`,
-      'The tag is removed from everyone carrying it. No payments or records are affected.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setError(null);
-            try {
-              await deleteTag.mutateAsync(id);
-              router.back();
-            } catch (err) {
-              setError(err instanceof Error ? err.message : 'Could not delete the tag.');
-            }
-          },
-        },
-      ]
-    );
+  async function confirmDelete() {
+    const yes = await confirm({
+      title: `Delete ${tag!.name}?`,
+      message: 'The tag is removed from everyone carrying it. No payments or records are affected.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!yes) return;
+
+    setError(null);
+    try {
+      await deleteTag.mutateAsync(id);
+      goBack();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not delete the tag.');
+    }
   }
 
   return (
@@ -146,7 +142,7 @@ export default function TagScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

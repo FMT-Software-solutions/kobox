@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -11,6 +11,7 @@ import { rememberSignIn } from '@/features/auth/last-login';
 import { formatGhanaPhone } from '@/lib/phone';
 import { describeAuthError } from '@/lib/auth-errors';
 import { supabase } from '@/lib/supabase';
+import { goBack } from '@/lib/navigation';
 
 const CODE_LENGTH = 6;
 
@@ -22,7 +23,6 @@ const CODE_LENGTH = 6;
  */
 export default function VerifyOtpScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { phone } = useLocalSearchParams<{ phone: string }>();
 
   const [code, setCode] = useState('');
@@ -88,7 +88,7 @@ export default function VerifyOtpScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

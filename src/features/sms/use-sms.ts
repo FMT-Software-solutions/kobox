@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as WebBrowser from 'expo-web-browser';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 
 import {
   fetchPurchaseStatus,
@@ -130,13 +131,25 @@ export function useCreditPurchase(groupId: string | undefined) {
       setError(null);
       setPhase('starting');
 
+      // In a browser the checkout needs a tab of its own, and it has to be
+      // opened NOW: a tab opened after the request below returns is no longer
+      // the click that asked for it, and Safari blocks it without a word. So it
+      // opens empty and is pointed at Paystack once the address is known. This
+      // page stays put underneath, which is what lets it keep polling.
+      const tab = Platform.OS === 'web' ? window.open('', '_blank') : null;
+
       let reference: string;
       try {
         const handle = await initializePurchase({ groupId, ...input });
         reference = handle.reference;
         setPhase('waiting');
-        await WebBrowser.openBrowserAsync(handle.authorizationUrl);
+        if (tab) {
+          tab.location.href = handle.authorizationUrl;
+        } else {
+          await WebBrowser.openBrowserAsync(handle.authorizationUrl);
+        }
       } catch (err) {
+        tab?.close();
         setError(err instanceof Error ? err.message : 'Could not start the payment.');
         setPhase('failed');
         return;

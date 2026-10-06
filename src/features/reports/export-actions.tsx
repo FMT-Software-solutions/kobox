@@ -1,12 +1,14 @@
 import { Download, FileText, MessageCircle, Table } from 'lucide-react-native';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useBrand } from '@/features/groups/brand';
 
 import { saveCsv, savePdf, shareCsv, sharePdf, shareText } from './export';
+
+const IS_WEB = Platform.OS === 'web';
 
 export interface ExportActionsProps {
   /** Built lazily: a report only pays for the format actually chosen. */
@@ -39,7 +41,9 @@ export function ExportActions({ fileName, text, csv, html, disabled }: ExportAct
 
     try {
       if (kind === 'text') {
-        await shareText(text());
+        // A desktop browser has no share sheet, so the text goes to the
+        // clipboard instead and has to say so.
+        if ((await shareText(text())) === 'copied') setNotice('Copied.');
       } else if (kind === 'share-csv') {
         await shareCsv(fileName(), csv());
       } else if (kind === 'share-pdf') {
@@ -72,32 +76,38 @@ export function ExportActions({ fileName, text, csv, html, disabled }: ExportAct
         onPress={() => run('text')}
       />
 
-      <Text variant="caption" className="mt-1">
-        Share a file
-      </Text>
-      <View className="flex-row gap-2">
-        <Button
-          label="CSV"
-          variant="outline"
-          className="flex-1"
-          disabled={disabled}
-          icon={<Table size={16} color={brand.deep} />}
-          loading={busy === 'share-csv'}
-          onPress={() => run('share-csv')}
-        />
-        <Button
-          label="PDF"
-          variant="outline"
-          className="flex-1"
-          disabled={disabled}
-          icon={<FileText size={16} color={brand.deep} />}
-          loading={busy === 'share-pdf'}
-          onPress={() => run('share-pdf')}
-        />
-      </View>
+      {/* In a browser, sharing a file and saving one are the same download,
+          so the web build offers the one row. */}
+      {!IS_WEB && (
+        <>
+          <Text variant="caption" className="mt-1">
+            Share a file
+          </Text>
+          <View className="flex-row gap-2">
+            <Button
+              label="CSV"
+              variant="outline"
+              className="flex-1"
+              disabled={disabled}
+              icon={<Table size={16} color={brand.deep} />}
+              loading={busy === 'share-csv'}
+              onPress={() => run('share-csv')}
+            />
+            <Button
+              label="PDF"
+              variant="outline"
+              className="flex-1"
+              disabled={disabled}
+              icon={<FileText size={16} color={brand.deep} />}
+              loading={busy === 'share-pdf'}
+              onPress={() => run('share-pdf')}
+            />
+          </View>
+        </>
+      )}
 
       <Text variant="caption" className="mt-1">
-        Save to this phone
+        {IS_WEB ? 'Download' : 'Save to this phone'}
       </Text>
       <View className="flex-row gap-2">
         <Button

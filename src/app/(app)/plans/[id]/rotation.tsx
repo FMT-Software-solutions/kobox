@@ -1,14 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CheckCircle2, ChevronLeft, HandCoins, RotateCw, UserPlus } from 'lucide-react-native';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/shared/empty-state';
@@ -19,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Text } from '@/components/ui/text';
+import { confirm } from '@/lib/confirm';
 import { useBrand } from '@/features/groups/brand';
 import { useCurrentGroup } from '@/features/groups/current-group';
 import { useMembers } from '@/features/members/use-members';
@@ -32,6 +26,7 @@ import {
 } from '@/features/rotation/use-rotation';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
 import type { CurrencyCode } from '@/lib/money';
+import { goBack } from '@/lib/navigation';
 
 export default function RotationScreen() {
   const brand = useBrand();
@@ -83,18 +78,15 @@ export default function RotationScreen() {
   }
 
   function confirmReverse(slotId: string, name: string) {
-    Alert.alert(
-      `Undo ${name}'s payout?`,
-      'The expense is voided, the group balance is restored, and their turn becomes available again.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Undo it',
-          style: 'destructive',
-          onPress: () => reversePayout.mutate({ slotId, reason: 'Payout reversed by an admin' }),
-        },
-      ]
-    );
+    confirm({
+      title: `Undo ${name}'s payout?`,
+      message:
+        'The expense is voided, the group balance is restored, and their turn becomes available again.',
+      confirmLabel: 'Undo it',
+      destructive: true,
+    }).then((yes) => {
+      if (yes) reversePayout.mutate({ slotId, reason: 'Payout reversed by an admin' });
+    });
   }
 
   const paidCount = slots.filter((s) => s.status === 'paid').length;
@@ -108,7 +100,7 @@ export default function RotationScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

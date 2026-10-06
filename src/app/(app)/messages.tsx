@@ -19,6 +19,7 @@ import type { MessageHistoryRow } from '@/features/messages/api';
 import { useMessageHistory } from '@/features/messages/use-messages';
 import { useSmsBalance } from '@/features/sms/use-sms';
 import { ROLE_RANK, type MemberRole } from '@/lib/domain';
+import { goBack } from '@/lib/navigation';
 
 function audienceLabel(row: MessageHistoryRow): string {
   if (row.audience === 'everyone') return 'Everyone';
@@ -119,7 +120,7 @@ export default function MessagesScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="-ml-2 rounded-full p-2 active:bg-secondary">
           <ChevronLeft size={22} color="#66756F" />
         </Pressable>

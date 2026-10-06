@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
@@ -11,10 +10,10 @@ import { useCurrentGroup } from '@/features/groups/current-group';
 import { DEFAULT_TAG_COLOUR } from '@/features/tags/api';
 import { ColourPicker } from '@/features/tags/colour-picker';
 import { useCreateTag } from '@/features/tags/use-tags';
+import { goBack } from '@/lib/navigation';
 
 export default function NewTagScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { membership } = useCurrentGroup();
   const createTag = useCreateTag();
 
@@ -33,7 +32,7 @@ export default function NewTagScreen() {
 
     try {
       await createTag.mutateAsync({ groupId: membership.groupId, name: name.trim(), colour });
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create the tag. Try again.');
     }
@@ -50,7 +49,7 @@ export default function NewTagScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Close"
-          onPress={() => router.back()}
+          onPress={() => goBack()}
           className="rounded-full bg-secondary p-2">
           <X size={18} color="#66756F" />
         </Pressable>

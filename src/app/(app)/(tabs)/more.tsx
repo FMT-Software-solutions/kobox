@@ -20,7 +20,7 @@ import {
   Users,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, Share, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Share, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -29,6 +29,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { useSession } from '@/features/auth/session-provider';
+import { WEB_APP_URL } from '@/lib/backend';
 import { useBrand } from '@/features/groups/brand';
 import { useCurrentGroup } from '@/features/groups/current-group';
 import {
@@ -190,15 +191,23 @@ export default function MoreScreen() {
     // React Native's own Share sheet, so the invite goes wherever the person
     // already talks to their group — WhatsApp, SMS, anywhere. No extra
     // dependency and no per-app integration to keep working.
-    Share.share({
-      message:
-        `Join ${membership.groupName} on Kobox.\n\n` +
-        `Use this code when you sign up: ${code}` +
-        (invite.data?.expiresAt
-          ? `\n\nThe code stops working on ${new Date(invite.data.expiresAt).toLocaleDateString()}.`
-          : ''),
-    }).catch(() => {
+    const message =
+      `Join ${membership.groupName} on Kobox: ${WEB_APP_URL}\n\n` +
+      `Use this code when you sign up: ${code}` +
+      (invite.data?.expiresAt
+        ? `\n\nThe code stops working on ${new Date(invite.data.expiresAt).toLocaleDateString()}.`
+        : '');
+
+    Share.share({ message }).catch(async (err: unknown) => {
       // Dismissing the sheet is not an error worth reporting.
+      if (Platform.OS !== 'web') return;
+      if (err instanceof Error && err.name === 'AbortError') return;
+
+      // A desktop browser has no share sheet at all, so the whole invitation
+      // goes to the clipboard and the code row says so.
+      await Clipboard.setStringAsync(message);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     });
   }
 

@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert } from 'react-native';
+
+import { confirm } from '@/lib/confirm';
+import { goBack } from '@/lib/navigation';
 
 import type { PlanRow } from './api';
 import { useDeletePlan, useUpdatePlan } from './use-plans';
@@ -19,51 +21,41 @@ export function usePlanActions(plan: PlanRow) {
   const deletePlan = useDeletePlan();
   const [error, setError] = useState<string | null>(null);
 
-  function confirmEnd() {
-    Alert.alert(
-      'End this contribution?',
-      'No new periods will open. Everything already recorded stays exactly as it is.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'End it',
-          style: 'destructive',
-          onPress: async () => {
-            setError(null);
-            try {
-              await updatePlan.mutateAsync({ planId: plan.id, status: 'ended' });
-              router.back();
-            } catch (err) {
-              setError(err instanceof Error ? err.message : 'Could not end the contribution.');
-            }
-          },
-        },
-      ]
-    );
+  async function confirmEnd() {
+    const yes = await confirm({
+      title: 'End this contribution?',
+      message: 'No new periods will open. Everything already recorded stays exactly as it is.',
+      confirmLabel: 'End it',
+      destructive: true,
+    });
+    if (!yes) return;
+
+    setError(null);
+    try {
+      await updatePlan.mutateAsync({ planId: plan.id, status: 'ended' });
+      goBack();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not end the contribution.');
+    }
   }
 
-  function confirmDelete() {
-    Alert.alert(
-      'Delete this contribution?',
-      'This cannot be undone. It is only possible while nobody has paid into it.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setError(null);
-            try {
-              await deletePlan.mutateAsync(plan.id);
-              // The detail screen has nothing left to show.
-              router.dismissTo('/contributions');
-            } catch (err) {
-              setError(err instanceof Error ? err.message : 'Could not delete the contribution.');
-            }
-          },
-        },
-      ]
-    );
+  async function confirmDelete() {
+    const yes = await confirm({
+      title: 'Delete this contribution?',
+      message: 'This cannot be undone. It is only possible while nobody has paid into it.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!yes) return;
+
+    setError(null);
+    try {
+      await deletePlan.mutateAsync(plan.id);
+      // The detail screen has nothing left to show.
+      router.dismissTo('/contributions');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not delete the contribution.');
+    }
   }
 
   return {

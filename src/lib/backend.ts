@@ -22,6 +22,12 @@ export const APP_ID = 'kobox';
 export const APP_NAME = 'Kobox';
 
 /**
+ * Where the browser version lives. It goes into invitations, so somebody
+ * without the phone app has somewhere to use the join code.
+ */
+export const WEB_APP_URL = 'https://kobox.fmtsoftware.com';
+
+/**
  * Every backend route sits under a global `/api` prefix (`app.setGlobalPrefix`
  * in its main.ts), so the canonical value already ends in `/api`. A bare origin
  * is corrected rather than left to 404 — there is no deployment where

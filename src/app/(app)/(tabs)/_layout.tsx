@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Home, ReceiptText, Menu } from 'lucide-react-native';
+import { Platform } from 'react-native';
 
 import { useBrand } from '@/features/groups/brand';
 import { useIsDark } from '@/lib/use-is-dark';
@@ -35,6 +36,9 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: colors.bg,
           borderTopColor: colors.border,
+          // The default bar is sized for a phone with a home-indicator inset
+          // below it. A browser has none, and the labels were cut in half.
+          ...(Platform.OS === 'web' ? { height: 64 } : null),
         },
         tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
       }}>

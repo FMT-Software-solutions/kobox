@@ -192,7 +192,7 @@ export default function GroupSettingsScreen() {
                   icon={<Camera size={16} color={brand.deep} />}
                   onPress={pickLogo}
                 />
-                {data.logoUrl && (
+                {!!data.logoUrl && (
                   <Button
                     label="Remove"
                     size="sm"

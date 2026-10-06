@@ -107,68 +107,74 @@ export function Select<T extends string>({
         animationType="slide"
         transparent={false}
         onRequestClose={() => setOpen(false)}>
-        <View className="flex-1 bg-background" style={{ paddingTop: insets.top + 8 }}>
-          <View className="flex-row items-center gap-2 px-5 pb-3">
-            <Text variant="title" className="flex-1" numberOfLines={1}>
-              {label ?? placeholder}
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-              onPress={() => setOpen(false)}
-              className="rounded-full bg-secondary p-2">
-              <X size={18} color="#66756F" />
-            </Pressable>
-          </View>
-
-          {showSearch && (
-            <View className="px-5 pb-3">
-              <Input
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search"
-                autoCorrect={false}
-                autoCapitalize="none"
-                accessibilityLabel="Search options"
-              />
+        {/* The sheet fills a phone. In a browser window it keeps to the same
+            column as the rest of the app instead of stretching edge to edge. */}
+        <View className="flex-1 bg-background">
+          <View
+            className="w-full flex-1 web:max-w-[560px] web:self-center"
+            style={{ paddingTop: insets.top + 8 }}>
+            <View className="flex-row items-center gap-2 px-5 pb-3">
+              <Text variant="title" className="flex-1" numberOfLines={1}>
+                {label ?? placeholder}
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close"
+                onPress={() => setOpen(false)}
+                className="rounded-full bg-secondary p-2">
+                <X size={18} color="#66756F" />
+              </Pressable>
             </View>
-          )}
 
-          <FlatList
-            data={matches}
-            keyExtractor={(option) => option.value}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-            ListEmptyComponent={
-              <View className="px-5 py-8">
-                <Text variant="caption" className="text-center">
-                  Nothing matches “{query.trim()}”.
-                </Text>
+            {showSearch && (
+              <View className="px-5 pb-3">
+                <Input
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder="Search"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  accessibilityLabel="Search options"
+                />
               </View>
-            }
-            renderItem={({ item }) => {
-              const isSelected = item.value === value;
-              return (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: isSelected }}
-                  onPress={() => choose(item.value)}
-                  className="flex-row items-center gap-3 border-b border-border px-5 py-4 active:bg-secondary">
-                  <View className="flex-1">
-                    <Text variant="label" numberOfLines={1}>
-                      {item.label}
-                    </Text>
-                    {item.hint && (
-                      <Text variant="caption" numberOfLines={1}>
-                        {item.hint}
+            )}
+
+            <FlatList
+              data={matches}
+              keyExtractor={(option) => option.value}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+              ListEmptyComponent={
+                <View className="px-5 py-8">
+                  <Text variant="caption" className="text-center">
+                    Nothing matches “{query.trim()}”.
+                  </Text>
+                </View>
+              }
+              renderItem={({ item }) => {
+                const isSelected = item.value === value;
+                return (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isSelected }}
+                    onPress={() => choose(item.value)}
+                    className="flex-row items-center gap-3 border-b border-border px-5 py-4 active:bg-secondary">
+                    <View className="flex-1">
+                      <Text variant="label" numberOfLines={1}>
+                        {item.label}
                       </Text>
-                    )}
-                  </View>
-                  {isSelected && <Check size={18} color={brand.hex} />}
-                </Pressable>
-              );
-            }}
-          />
+                      {item.hint && (
+                        <Text variant="caption" numberOfLines={1}>
+                          {item.hint}
+                        </Text>
+                      )}
+                    </View>
+                    {isSelected && <Check size={18} color={brand.hex} />}
+                  </Pressable>
+                );
+              }}
+            />
+          </View>
         </View>
       </Modal>
     </View>

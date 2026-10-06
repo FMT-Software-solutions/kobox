@@ -139,9 +139,9 @@ export default function ExpensesScreen() {
               </View>
             </View>
 
-            {expense.note && <Text variant="caption">{expense.note}</Text>}
+            {!!expense.note && <Text variant="caption">{expense.note}</Text>}
 
-            {expense.voidReason && (
+            {!!expense.voidReason && (
               <Text variant="caption" className="text-destructive">
                 {expense.voidReason}
               </Text>

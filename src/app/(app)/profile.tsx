@@ -161,7 +161,7 @@ export default function ProfileScreen() {
                 disabled={isBusy}
                 onPress={pickAvatar}
               />
-              {data?.avatarUrl && (
+              {!!data?.avatarUrl && (
                 <Button
                   label="Remove"
                   size="sm"
@@ -206,8 +206,8 @@ export default function ProfileScreen() {
             with its own verification, not a profile edit. */}
         <Card className="gap-1">
           <Text variant="label">How you sign in</Text>
-          {data?.phone && <Text variant="caption">{formatGhanaPhone(data.phone)}</Text>}
-          {session?.user.email && <Text variant="caption">{session.user.email}</Text>}
+          {data?.phone ? <Text variant="caption">{formatGhanaPhone(data.phone)}</Text> : null}
+          {session?.user.email ? <Text variant="caption">{session.user.email}</Text> : null}
         </Card>
 
         {notice && (

@@ -95,11 +95,6 @@ export default function SignInScreen() {
           <Text variant="caption">Not you? Clear this</Text>
         </Pressable>
       )}
-
-      <Text variant="caption" className="text-center">
-        Either way you get the same account. Whether you are a member or run the group is decided
-        per group, not here.
-      </Text>
     </ScrollView>
   );
 }

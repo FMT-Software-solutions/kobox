@@ -175,7 +175,7 @@ export function DateField({
           <Pressable
             onPress={() => {}}
             style={{ maxHeight: windowHeight * 0.7 }}
-            className="overflow-hidden rounded-xl border border-border bg-card">
+            className="overflow-hidden rounded-xl border border-border bg-card web:w-full web:max-w-[480px] web:self-center">
             <View className="border-b border-border px-4 py-3">
               <Text variant="heading">{label ?? 'Choose a date'}</Text>
               <Text variant="caption">{formatValue(draft)}</Text>

@@ -173,7 +173,7 @@ export default function StatementScreen() {
                       {formatFullDate(payment.paidAt.slice(0, 10))}
                       {payment.reference ? ` · ${payment.reference}` : ''}
                     </Text>
-                    {payment.note && (
+                    {!!payment.note && (
                       <Text variant="caption" numberOfLines={2}>
                         {payment.note}
                       </Text>

@@ -3,7 +3,7 @@
 Read this first in a new session. It records what Kobox is, what is built, the
 rules the code enforces, and what to do next.
 
-_Last updated: 9 September 2026._
+_Last updated: 6 October 2026._
 
 ---
 
@@ -42,7 +42,9 @@ v4, which post-dates RN 0.86. Verified by bundling.
 the **development build** (an installable APK from EAS). Rebuild it only when a
 package with native code is added; pure-JS packages need no rebuild.
 
-> **Native modules are current as of 8 September 2026.** The build of that date
+> **Native modules are current as of 11 September 2026.** The development build
+> of that date (commit `2ecba73`) is the first to carry `google-services.json`,
+> which Android push needs — an older build cannot get a push token at all. It
 > carries everything: `expo-clipboard`, `expo-image-picker`,
 > `expo-image-manipulator`, plus `expo-print`, `expo-sharing`,
 > `expo-file-system` (reports), `expo-notifications` and
@@ -79,6 +81,12 @@ npm run db:types      # regenerate src/lib/database.types.ts safely
 npm run purge:scratch # dry-run the leftover-scratch-group cleanup (--delete to commit)
 npx supabase db push  # apply migrations (no Docker needed)
 ```
+
+The Supabase CLI is a devDependency (added 6 October 2026), so `npx supabase`
+runs the pinned copy instead of downloading one. `npx supabase db query
+--linked "<sql>"` runs SQL against the live project with the login role — it
+is how the state of `app_config`, the outbox and the cron jobs was checked
+without the dashboard.
 
 **After any migration that adds an RPC, push it and then run `npm run db:types`
 before `npm run check`.** `database.types.ts` is generated from the live
@@ -207,6 +215,12 @@ Payment  →  Allocations  →  applied against Obligations
 **Phase 0–2 complete**: auth, groups, members, contributions, payments,
 expenses, susu.
 
+**Creating a new susu is switched off in the UI** (11 September 2026). The
+option shows in `plans/new.tsx` as "Coming soon" and cannot be chosen, until
+susu has been tested on its own. The database still accepts `rotating` and
+existing susu plans keep working. Remove `disabled` and `badge` from
+`KIND_OPTIONS` to open it.
+
 | Area          | Screens                                                                              |
 | ------------- | ------------------------------------------------------------------------------------ |
 | Auth          | `(auth)/sign-in.tsx` chooser, `phone.tsx`, `verify.tsx`, `email.tsx`                 |
@@ -224,7 +238,7 @@ expenses, susu.
 51 migrations, all applied and tracked. Feature code in `src/features/*` as
 `api.ts` + `use-*.ts` pairs.
 
-### Auth — in progress (4 August 2026)
+### Auth — OTP and email done; PIN not started
 
 Goal: members sign in with **phone + PIN**, admins keep **email + password**.
 
@@ -347,7 +361,8 @@ It expired on 31 August 2026 and cost most of a session to diagnose on
 Supabase's rate limit (`you can only request this after 3 seconds`). See
 `testPhoneSession()`.
 
-Still to do: the PIN with device trust, and the group switcher.
+Still to do: the PIN with device trust. Nothing of it exists in `src` — members
+sign in with an OTP every time. The group switcher is done (section 5).
 
 ### Susu specifics
 
@@ -569,15 +584,18 @@ failing ledger checks, then fixed:
 4. ~~A `set_plan_override` RPC plus UI.~~ Done.
 5. ~~Fix the ledger teardown.~~ Done.
 6. ~~Reports.~~ Done — five of them, with CSV/PDF/text export.
-7. ~~Notifications.~~ Built, not yet live. See section 11.
+7. ~~Notifications.~~ Switched on; nothing has been delivered yet. See
+   section 11.
 8. ~~SMS credits and the billing mapping.~~ Done — a group is the organization.
    See section 12.
 
-### What is actually left (11 September 2026)
+### What is actually left (6 October 2026)
 
 In rough order of how much they block real use:
 
-1. **Switch notifications on.** Two config steps. See section 11.
+1. **Get a first notification delivered.** The pipeline is on, but no phone
+   has ever registered a push token and no group holds SMS credit, so nothing
+   has reached anybody. See section 11.
 2. **`@react-native-community/datetimepicker` is installed and unused.** The
    custom `DateField` still ships. Swapping it costs no rebuild now.
 3. **Leaving a group.** `join_group` already reactivates a `left` membership
@@ -634,14 +652,44 @@ Refused for a susu and for open giving, matching `set_plan_tag_amount`. The
 table keeps its RLS policy — revoking it would be a silent behaviour change for
 anything already reading it — but the app now only ever calls the RPCs.
 
-### 11. Notifications — BUILT, NOT YET LIVE (9 September 2026)
+### 11. Notifications — SWITCHED ON, NOTHING DELIVERED YET (6 October 2026)
 
 Migrations `20260909000000`–`20260909030000`, the `dispatch-notifications` Edge
 Function, and `src/features/notifications/*`.
 
-**Nothing sends until `app_config` is filled in.** That is the intended resting
-state: rows queue up, the cron job sees no dispatcher and returns. See
-"Switching notifications on" below.
+**The pipeline has been live since 11 September 2026.** Checked on 6 October:
+the function is deployed (version 5), `DISPATCH_SECRET`, `BACKEND_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` are set, `app_config` holds the dispatch URL and
+secret, and all four cron jobs are active. The outbox is drained within a
+minute of a row becoming due.
+
+**And yet nothing has ever reached anybody.** 639 rows were claimed between
+8 September and 5 October with `push_sent` and `sms_sent` false on every one:
+
+- **`expo_push_tokens` is empty.** No phone has ever registered. The
+  11 September development build is the first that can; either it has not been
+  opened signed in, or `registerPushToken` is failing — and it swallows every
+  error, so a failure is indistinguishable from never having run. Open that
+  build signed in, allow notifications, then
+  `select count(*) from expo_push_tokens`. If it is still zero, log the caught
+  error in `push.ts` before guessing.
+- **Expo also needs an FCM V1 service account key** on the EAS project
+  (`eas credentials` → Android → Google Service Account) before it can deliver
+  to Android. Not verified — the command is interactive. Without it a token
+  registers and the push ticket comes back `InvalidCredentials`.
+- **No group holds SMS credit**, so `want_sms` is false on every row.
+  `sms_credit_transactions` is empty: nobody has bought any.
+
+**"Sent" means claimed, not delivered.** A row with no token and no credit is
+still marked `sent`. Read `push_sent` and `sms_sent` for what happened.
+
+**Almost all of that traffic is test debris.** 83 of the 86 groups are leftover
+ledger scratch groups, and the daily reminder jobs queue rows for each of them.
+Harmless while they hold no credit; `npm run purge:scratch -- --delete` clears
+them.
+
+An unconfigured project still queues and sends nothing: with `app_config`
+empty the cron job sees no dispatcher and returns.
 
 **One outbox, two channels.** Triggers write a `notifications` row in the same
 transaction as the event; a worker drains it afterwards. Sending inline was
@@ -677,6 +725,8 @@ reminder from the group collecting their rent and none from the old students'
 association.
 
 #### Switching notifications on
+
+Done on this project. Kept for a fresh one:
 
 1. Set the Edge Function secrets: `DISPATCH_SECRET`, `BACKEND_URL`, and
    `SUPABASE_SERVICE_ROLE_KEY`.
@@ -1178,13 +1228,10 @@ id for a group the user has since left falls through to the same fallback.
 
 ## Moving this project
 
-Everything below assumes the folder is **copied**, not re-cloned. As of
-9 September 2026 the repository has exactly **one commit — the create-expo-app
-scaffold.** Every line of Kobox is uncommitted: 25 modified files and 171
-untracked ones. A `git clone` of this repo produces an empty starter app.
-
-**Commit before moving, or copy the whole directory.** Those are the only two
-safe options.
+Everything below assumes the folder is **copied**, not re-cloned. That is no
+longer the only safe way: everything has been committed and pushed to
+`origin/main` since 11 September 2026, so a clone brings the whole app. It
+still does not bring the gitignored files below.
 
 ### Must travel with it
 
@@ -1204,8 +1251,8 @@ safe options.
 ```bash
 npm install
 npx supabase migration list --linked   # expect every row local == remote
-npm run check                          # typecheck, lint, prettier, 51 unit tests
-npm run test:ledger                    # 95 checks against the real project
+npm run check                          # typecheck, lint, prettier, 60 unit tests
+npm run test:ledger                    # 112 checks against the real project
 ```
 
 If `migration list` shows drift, `npx supabase migration repair --status applied <version>`.
@@ -1217,7 +1264,7 @@ LAN IP does.
 
 ### What lives outside this repo
 
-- **Supabase project `zvybpxxcrdenlmgcwnmq`** — migrations, RLS, the two Edge
+- **Supabase project `zvybpxxcrdenlmgcwnmq`** — migrations, RLS, the three Edge
   Functions and their secrets, the phone-auth test number and its expiry date.
 - **EAS project `8d5867f0-c5cc-4645-a232-3c015c36ee34`** — builds and
   credentials, under the `ankomahenes-team` account.
@@ -1229,11 +1276,12 @@ LAN IP does.
 
 ## Known gaps
 
-- **Phone OTP is not built** (in progress). The old note here said Arkesel needs
-  a custom Edge Function because Supabase phone auth supports only Twilio,
-  MessageBird and Vonage. That is out of date: Supabase's **Send SMS Hook** lets
-  Supabase keep generating, hashing, expiring, rate-limiting and verifying the
-  OTP while handing only the delivery to a function of ours. We never mint JWTs.
+- **Phone + PIN sign-in is not built.** Phone OTP is (verified 4 August 2026,
+  through Supabase's **Send SMS Hook**), so members sign in with a code every
+  time; the PIN with device trust that was meant to replace it has not been
+  started.
+
+- **SMS goes through fmt-ss-backend.** Notes for anything that sends one:
 
   **Arkesel is already solved elsewhere in this org — do not re-implement it.**
   Source of truth: `fmt-ss-backend/src/common/arkesel/arkesel.service.ts`

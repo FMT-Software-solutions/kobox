@@ -615,14 +615,27 @@ In rough order of how much they block real use:
 8. **iOS is untested**, and push there needs APNs certificates, which needs the
    Apple Developer account.
 9. **No audit log.** Every money RPC records who acted, but nothing surfaces it.
-10. **Web phase 2 — the full app in a browser, for iPhone users.** Phase 1
-    (section 14) shipped only the public pages. Known gaps before the signed-in
-    app is web-ready: 7 `Alert.alert` calls in 5 files are no-ops on the web
-    (the message composer's "Send this message?" among them); report export
-    uses `expo-print` / `expo-sharing` / `expo-file-system` (phone-only);
-    push is phone-only; phone-width screens need a centred column on desktop.
-    Prefer `Platform.OS` branches or `.web.tsx` files where one implementation
-    cannot serve both well.
+10. **Web phase 2 — the signed-in app in a browser. Done 6 October 2026**, so
+    people can use Kobox before the Android release. What it took, because each
+    is a rule for anything added later:
+    - does nothing in a browser. Use from
+      , never directly.
+    - does nothing after a refresh or a shared link. Use
+      from .
+    - Report export has a web twin, : CSV downloads, PDF is the
+      print dialog, text is the share sheet or the clipboard. What a report
+      contains lives once, in .
+    - renders the value itself when it is — a
+      console error on the web and a crash on a phone. A phone-only account
+      has an empty email. Use for anything from the database.
+    - A tab opened after an is blocked by Safari; the Paystack
+      checkout opens its tab first and points it afterwards.
+    - classes keep the picker sheets inside the 560px column.
+
+    Run it locally with . Still open: no web manifest or
+    home-screen icon, the Paystack purchase and new sign-up are untested on
+    the web, and nothing has been tried in Safari on an iPhone.
+
 11. **Message history has no per-recipient view.** It shows counts (texted,
     delivered, pushed, not texted); "which three were not texted?" needs a
     detail screen over the outbox rows.
@@ -762,8 +775,7 @@ the browser; Netlify's `/* → /index.html` rule makes every route a real URL.
 can break the phone: `npm run check`, `npx expo export --platform web` (proves
 the web build compiles), and the Android bundle through Metro
 (`/node_modules/expo-router/entry.bundle?platform=android&dev=true`). The
-in-app browser pane in Claude Code refuses `localhost`, so web pages have to be
-looked at in a real browser.
+in-app browser pane in Claude Code does open `localhost` now.
 
 **`(public)` routes sit outside both guards**: `/privacy` and
 `/delete-account`. A signed-in member reaches the same screens from Settings.

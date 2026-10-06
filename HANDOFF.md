@@ -618,21 +618,21 @@ In rough order of how much they block real use:
 10. **Web phase 2 — the signed-in app in a browser. Done 6 October 2026**, so
     people can use Kobox before the Android release. What it took, because each
     is a rule for anything added later:
-    - does nothing in a browser. Use from
-      , never directly.
-    - does nothing after a refresh or a shared link. Use
-      from .
-    - Report export has a web twin, : CSV downloads, PDF is the
+    - `Alert.alert` does nothing in a browser. Use `confirm()` from
+      `src/lib/confirm.ts`, never `Alert` directly.
+    - `router.back()` does nothing after a refresh or a shared link. Use
+      `goBack()` from `src/lib/navigation.ts`.
+    - Report export has a web twin, `export.web.ts`: CSV downloads, PDF is the
       print dialog, text is the share sheet or the clipboard. What a report
-      contains lives once, in .
-    - renders the value itself when it is — a
+      contains lives once, in `report-format.ts`.
+    - `{value && <Text>}` renders the value itself when it is `''` — a
       console error on the web and a crash on a phone. A phone-only account
-      has an empty email. Use for anything from the database.
-    - A tab opened after an is blocked by Safari; the Paystack
+      has an empty email. Use `!!value &&` for anything from the database.
+    - A tab opened after an `await` is blocked by Safari; the Paystack
       checkout opens its tab first and points it afterwards.
-    - classes keep the picker sheets inside the 560px column.
+    - `web:` classes keep the picker sheets inside the 560px column.
 
-    Run it locally with . Still open: no web manifest or
+    Run it locally with `npm run web`. Still open: no web manifest or
     home-screen icon, the Paystack purchase and new sign-up are untested on
     the web, and nothing has been tried in Safari on an iPhone.
 

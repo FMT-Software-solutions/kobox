@@ -50,8 +50,13 @@ export const BACKEND = {
  *
  * Crediting does not depend on this. The Paystack webhook credits the group
  * server-side whatever the browser does — this only decides where the person
- * lands, and the app polls the reference regardless. It is a shared page across
- * every FMT product; `appId` tells it which database to look the purchase up in.
+ * lands, and the app polls the reference regardless.
+ *
+ * It is Kobox's own page, `/payment-complete` on the web app, for the phone app
+ * and the browser alike. It used to be the page every FMT product shares on
+ * fmtsoftware.com, from when Kobox had no website to land on; that page still
+ * works for a Kobox reference and is the one to point back at if this site is
+ * ever down. Paystack appends `reference` itself, which is all the page needs.
  *
  * A deep link back into the app would be neater and is wrong: Paystack requires
  * an https callback, and a custom scheme silently falls back to the Paystack
@@ -59,11 +64,7 @@ export const BACKEND = {
  * entirely.
  */
 export function paymentCallbackUrl(): string {
-  const url = new URL('https://fmtsoftware.com/payment-complete');
-  url.searchParams.set('app', APP_NAME);
-  url.searchParams.set('appId', APP_ID);
-  url.searchParams.set('product', 'sms');
-  return url.toString();
+  return `${WEB_APP_URL}/payment-complete`;
 }
 
 /** A backend error carries a `message`; a network failure does not. */

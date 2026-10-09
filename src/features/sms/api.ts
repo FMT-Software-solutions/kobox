@@ -169,9 +169,27 @@ export async function initializePurchase(input: {
 
 export type PurchaseStatus = 'pending' | 'success' | 'failed' | 'unknown';
 
+export interface Purchase {
+  status: PurchaseStatus;
+  /** Present once the backend has a record of the purchase. */
+  creditsPurchased: number | null;
+}
+
+/**
+ * Public on the backend: anybody holding a reference may ask, and it answers
+ * only what the payer already knows. That is what lets the confirmation page
+ * work in a browser nobody is signed in to — the phone app's checkout lands
+ * there.
+ */
+export async function fetchPurchase(reference: string): Promise<Purchase> {
+  const body = await backendJson<{ status: PurchaseStatus; creditsPurchased?: number }>(
+    BACKEND.purchaseStatus(reference)
+  );
+  return { status: body.status, creditsPurchased: body.creditsPurchased ?? null };
+}
+
 export async function fetchPurchaseStatus(reference: string): Promise<PurchaseStatus> {
-  const body = await backendJson<{ status: PurchaseStatus }>(BACKEND.purchaseStatus(reference));
-  return body.status;
+  return (await fetchPurchase(reference)).status;
 }
 
 /* --------------------------------------------------------------- sender id -- */

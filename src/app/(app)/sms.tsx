@@ -120,8 +120,11 @@ export default function SmsScreen() {
       userId: session.user.id,
       // Paystack requires an email for the receipt. An account that signed up by
       // phone has none, so the group's own name is not enough — fall back to a
-      // deliverable address rather than refusing the purchase.
-      email: session.user.email ?? 'receipts@fmtsoftware.com',
+      // deliverable address rather than refusing the purchase. `||`, not `??`:
+      // a phone-only account's email is the empty string, not null, and `??`
+      // passed that straight through to be refused as "email should not be
+      // empty".
+      email: session.user.email || 'receipts@fmtsoftware.com',
       amountGhs: amount,
     });
   }
